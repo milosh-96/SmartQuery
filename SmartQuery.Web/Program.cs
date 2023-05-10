@@ -1,3 +1,6 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using HtmlTags;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmartQuery.Web.Data;
@@ -19,6 +22,14 @@ namespace SmartQuery.Web
 
             builder.Services.AddDefaultIdentity<WebUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<SmartQueryDbContext>();
+
+
+            builder.Services.AddHtmlTags();
+
+            builder.Services.AddMediatR(c=>c.RegisterServicesFromAssembly(typeof(Program).Assembly));
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddFluentValidationClientsideAdapters();
+            builder.Services.AddValidatorsFromAssemblyContaining<Program>();
             builder.Services.AddRazorPages();
 
             var app = builder.Build();
