@@ -21,15 +21,23 @@ namespace SmartQuery.Web.Pages.Entries
         public void OnGet()
         {
         }
-        public async Task OnPostAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
-             await _mediator.Send(Data);
+             var result = await _mediator.Send(Data);
+            if(result == 1)
+            {
+                Data = new Command();
+                ModelState.Clear();
+            }
+            return RedirectToPage("/Entries/Create");
+
         }
         public record Command : IRequest<int>
         {
             public string Name { get; init; }
             public string Description { get; init; }
             public string Adjectives { get; init; }
+            public string RelatedTo { get; init; }
         }
         public class CommandHandler : IRequestHandler<Command, int>
         {
@@ -55,6 +63,14 @@ namespace SmartQuery.Web.Pages.Entries
                     if (adjective != null)
                     {
                         entry.Adjectives.Add(adjective);
+                    }
+                }
+                foreach(var item in request.RelatedTo.Split(","))
+                {
+                    var relatedTo = await _context.Set<Entry>().FirstOrDefaultAsync(x => x.Name == item);
+                    if (relatedTo != null)
+                    {
+                        entry.RelatedTo.Add(relatedTo);
                     }
                 }
                 await _context.Set<Entry>().AddAsync(entry);
