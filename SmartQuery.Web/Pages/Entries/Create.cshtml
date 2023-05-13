@@ -24,12 +24,29 @@
                 </textarea>
             </div>
             <div class="form-group">
-                <label asp-for="@Model.Data.Adjectives"></label>
-                <input class="form-control" asp-for="@Model.Data.Adjectives" />
+                <div class="row">
+                    <div class="col">
+                        <label asp-for="@Model.Data.Adjectives"></label>
+                        <input type="hidden" autocomplete="off" asp-for="@Model.Data.Adjectives" />
+                        <input type="text" autocomplete="off" class="form-control adjectives-autocomplete typeahead" />
+                    </div>
+                    <div class="col">
+                        Selected: <ul class="list-group" id="selectedAdjectives"></ul>
+                    </div>
+                </div>
+
             </div>
             <div class="form-group">
-                <label asp-for="@Model.Data.RelatedTo"></label>
-                <input class="form-control" asp-for="@Model.Data.RelatedTo" />
+                <div class="row">
+                    <div class="col">
+                        <label asp-for="@Model.Data.RelatedTo"></label>
+                        <input type="hidden" autocomplete="off" asp-for="@Model.Data.RelatedTo" />
+                        <input type="text" autocomplete="off" class="form-control entries-autocomplete typeahead" />
+                    </div>
+                    <div class="col">
+                        Selected: <ul class="list-group" id="selectedEntries"></ul>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -42,8 +59,68 @@
     <a asp-page="Index">Back to List</a>
 </div>
 
+@section Stylesheets {
+    <style>
+        .tt-suggestion {
+            background: white;
+            border-bottom:1px solid #ccc;
+            width:100%;padding:2px;
+            min-width:200px;
+        }
+    </style>
+}
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="/lib/typeahead.js/typeahead.bundle.js"></script>
+    <script>
+        var currentAdjectiveSelection = "";
+        var adjectives = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            prefetch: '/Adjectives/Api/ListByName?Query=nice',
+            remote: {
+                url: '/Adjectives/Api/ListByName?Query=%QUERY',
+                wildcard: '%QUERY'
+            }
+        });
+        
+        
+        $('.adjectives-autocomplete.typeahead').typeahead(null, {
+            name: 'adjectives',
+            display: 'name',
+            source: adjectives
+        });
+        $('.adjectives-autocomplete.typeahead').on("typeahead:selected",function(e,item){
+            currentAdjectiveSelection += item.id + ",";
+            console.log(currentAdjectiveSelection);
+            $("#Data_Adjectives").val(currentAdjectiveSelection);
+            $("ul#selectedAdjectives").append('<li class="list-group-item">'+item.name+'</li>');
+            $('.adjectives-autocomplete.typeahead').typeahead('val', '');
+        });
+
+        var currentEntrySelection = "";
+        var entries = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            prefetch: '/Entries/Api/ListByName?Query=pro',
+            remote: {
+                url: '/Entries/Api/ListByName?Query=%QUERY',
+                wildcard: '%QUERY'
+            }
+        });
+        $('.entries-autocomplete.typeahead').typeahead(null, {
+            name: 'entries',
+            display: 'name',
+            source: entries
+        });
+        $('.entries-autocomplete.typeahead').on("typeahead:selected", function (e, item) {
+            currentEntrySelection += item.id + ",";
+            console.log(currentEntrySelection);
+            $("#Data_RelatedTo").val(currentEntrySelection);
+            $("ul#selectedEntries").append('<li class="list-group-item">'+item.name+'</li>');
+            $('.entries-autocomplete.typeahead').typeahead('val', '');
+        });
+    </script>
 }

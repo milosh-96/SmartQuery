@@ -57,17 +57,19 @@ namespace SmartQuery.Web.Pages.Entries
                     CreatedAt = DateTimeOffset.UtcNow
                 };
                 // parse adjectives input and try to find it in the adjectives table and then link //
-                foreach(var item in request.Adjectives.Split(","))
+                foreach(var itemId in request.Adjectives.TrimEnd(',').Split(","))
                 {
-                    var adjective = await _context.Set<Adjective>().FirstOrDefaultAsync(x => x.Name == item);
+                    int id = Int32.Parse(itemId);
+                    var adjective = await _context.Set<Adjective>().FirstOrDefaultAsync(x => x.Id == id);
                     if (adjective != null)
                     {
                         entry.Adjectives.Add(adjective);
                     }
                 }
-                foreach(var item in request.RelatedTo.Split(","))
+                foreach(var itemId in request.RelatedTo.TrimEnd(',').Split(","))
                 {
-                    var relatedTo = await _context.Set<Entry>().FirstOrDefaultAsync(x => x.Name == item);
+                    int id = Int32.Parse(itemId);
+                    var relatedTo = await _context.Set<Entry>().FirstOrDefaultAsync(x => x.Id == id);
                     if (relatedTo != null)
                     {
                         entry.RelatedTo.Add(relatedTo);
