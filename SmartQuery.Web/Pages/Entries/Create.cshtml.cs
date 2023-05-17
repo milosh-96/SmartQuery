@@ -62,7 +62,7 @@ namespace SmartQuery.Web.Pages.Entries
                         Adjective? adjective = _context.Set<Adjective>().FirstOrDefault(x => x.Id == Int32.Parse(adjectiveId));
                         if(adjective != null)
                         {
-                            //entry.Adjectives.Add(adjective);
+                            entry.Adjectives.Add(adjective);
                         } 
                         else
                         {
@@ -70,17 +70,31 @@ namespace SmartQuery.Web.Pages.Entries
                         }
                     }
                 }
-                if (request.RelatedTo != null && request.RelatedTo.Contains(',')) {
+                
+                await _context.Set<Entry>().AddAsync(entry);
+                var result = await _context.SaveChangesAsync();
+
+
+                if (request.RelatedTo != null && request.RelatedTo.Contains(','))
+                {
                     foreach (var relatedEntryId in request.RelatedTo.TrimEnd(',').Split(","))
                     {
                         Entry? relatedEntry = _context.Set<Entry>().FirstOrDefault(x => x.Id == Int32.Parse(relatedEntryId));
-                        if(relatedEntry != null)
+                        if (relatedEntry != null)
                         {
-                            entry.RelatedEntries.Add(new EntryEntry()
+                            _context.Set<EntryEntry>().AddRange(new List<EntryEntry>() {
+                                new EntryEntry()
                             {
                                 EntryId = entry.Id,
                                 RelatedEntryId = relatedEntry.Id
+                            },  new EntryEntry()
+                            {
+                                RelatedEntryId = entry.Id,
+                                EntryId = relatedEntry.Id
+                            }
                             });
+
+                        result =    await _context.SaveChangesAsync();
                         }
                         else
                         {
@@ -88,8 +102,6 @@ namespace SmartQuery.Web.Pages.Entries
                         }
                     }
                 }
-                await _context.Set<Entry>().AddAsync(entry);
-                var result = await _context.SaveChangesAsync();
 
                 return result;
             }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartQuery.Web.Data;
@@ -11,9 +12,10 @@ using SmartQuery.Web.Data;
 namespace SmartQuery.Web.Data.Migrations
 {
     [DbContext(typeof(SmartQueryDbContext))]
-    partial class SmartQueryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230517203756_AddUniqueForEntryEntry")]
+    partial class AddUniqueForEntryEntry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,51 +129,6 @@ namespace SmartQuery.Web.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("SmartQuery.Web.Models.Adjective", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Adjectives");
-                });
-
-            modelBuilder.Entity("SmartQuery.Web.Models.AdjectiveEntry", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AdjectiveId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("EntryId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EntryId");
-
-                    b.HasIndex("AdjectiveId", "EntryId")
-                        .IsUnique();
-
-                    b.ToTable("AdjectiveEntry");
                 });
 
             modelBuilder.Entity("SmartQuery.Web.Models.Entry", b =>
@@ -367,21 +324,6 @@ namespace SmartQuery.Web.Data.Migrations
                     b.HasOne("SmartQuery.Web.Models.WebUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SmartQuery.Web.Models.AdjectiveEntry", b =>
-                {
-                    b.HasOne("SmartQuery.Web.Models.Adjective", null)
-                        .WithMany()
-                        .HasForeignKey("AdjectiveId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SmartQuery.Web.Models.Entry", null)
-                        .WithMany()
-                        .HasForeignKey("EntryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

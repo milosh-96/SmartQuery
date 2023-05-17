@@ -16,9 +16,15 @@ namespace SmartQuery.Web.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            //builder.Entity<Entry>()
-            //    .HasMany(e => e.Adjectives).WithMany(e => e.Entries)
-            //    .UsingEntity<AdjectiveEntry>();
+            builder.Entity<Entry>()
+                .HasMany(e => e.Adjectives).WithMany(e => e.Entries)
+                .UsingEntity<AdjectiveEntry>();
+            
+
+            builder.Entity<AdjectiveEntry>().HasIndex(x => new { x.AdjectiveId, x.EntryId }).IsUnique();
+            
+            
+            builder.Entity<EntryEntry>().HasIndex(x => new { x.EntryId, x.RelatedEntryId }).IsUnique();
            
             
                 
@@ -29,6 +35,6 @@ namespace SmartQuery.Web.Data
         }
         public DbSet<Entry> Entries {get;set;} 
       
-       // public DbSet<Adjective> Adjectives {get;set;} 
+        public DbSet<Adjective> Adjectives {get;set;} 
     }
 }

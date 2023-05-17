@@ -14,7 +14,7 @@ namespace SmartQuery.Web.Models
         public string Description { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
 
-        //public List<Adjective> Adjectives { get; set; } = new List<Adjective>();
+        public List<Adjective> Adjectives { get; set; } = new List<Adjective>();
 
 
         public List<EntryEntry> RelatedEntries { get; set; } = new List<EntryEntry>();
