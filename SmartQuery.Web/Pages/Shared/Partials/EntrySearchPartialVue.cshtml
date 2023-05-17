@@ -1,0 +1,78 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<div id="app">
+    <p>
+    </p>
+    <div class="add-value d-md-flex" style="align-items:center">
+    <div class="w-100 md-w-20">Build a Query</div>
+        <input id="value-input" class="form-control rounded-0 w-100 md-w-60" type="text" v-model="inputValue" placeholder="Enter a value" />
+        <button class="btn btn-secondary w-100 md-w-20" @@click="addValue">Add</button>
+    </div>
+<form asp-page="/Entries/Search" method="get">
+    <hr />
+    <div>values: {{getTheValuesCount}}/10 </div>
+    <div class="query-builder d-md-flex">
+        <ul class="list-group list-group mb-2 md-mb-0 md-w-50 w-100">
+            <li v-for="item in currentQuery" class="list-group-item" style="display:flex">
+                    <div style="width:85%">
+                        {{item}}
+                    </div>
+                <div @@click="()=>removeValue(currentQuery.indexOf(item))">
+                        <iconify-icon icon="ic:baseline-remove-circle"></iconify-icon>
+                </div>
+            </li>
+        </ul>
+            <input id="query-input" type="hidden" name="query" v-model="joinedSearchValues" />
+        <select title="Set the search mode, display only items that have all entered values (AND) or at least one of the set values (OR)." class="form-control md-w-25 w-100" name="mode" >
+            <option value="1">OR</option>
+            <option selected value="2">AND</option>
+        </select>
+        <button class="btn btn-primary md-w-25 w-100" type="submit">Search</button>
+    </div>
+        <small>order of the items doesn't matter</small>
+
+    
+</form>
+</div>
+<script src="~/lib/vue/dist/vue.global.js"></script>
+<script>
+    
+   const {createApp} = Vue;
+
+   createApp({
+       
+       data() {
+           return {
+               inputValue:"",
+               currentQuery:["football","playstation 4"],
+           }
+       },
+       methods:{
+            addValue: function () {
+                if (this.inputValue.length > 0) {
+                    if(this.currentQuery.length < 10) {
+                        this.currentQuery.push(this.inputValue);
+                    }
+                }
+            },
+            removeValue: function (item) {
+                console.log(item);
+                this.currentQuery.splice(item,1);
+            }
+       },
+       computed:{
+           getTheValuesCount() {
+               return this.currentQuery.length;
+           },
+            joinedSearchValues(e, separator = ",") {
+                console.log(separator);
+                return this.currentQuery.join(separator);
+            }
+            
+        }
+   }).mount("#app");
+    
+</script>

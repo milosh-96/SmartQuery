@@ -16,8 +16,19 @@ namespace SmartQuery.Web.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            //builder.Entity<Entry>()
+            //    .HasMany(e => e.Adjectives).WithMany(e => e.Entries)
+            //    .UsingEntity<AdjectiveEntry>();
+           
+            
+                
+
+
+
+
         }
         public DbSet<Entry> Entries {get;set;} 
-        public DbSet<Adjective> Adjectives {get;set;} 
+      
+       // public DbSet<Adjective> Adjectives {get;set;} 
     }
 }

@@ -56,23 +56,36 @@ namespace SmartQuery.Web.Pages.Entries
                     Slug = new Slugify.SlugHelper().GenerateSlug(request.Name),
                     CreatedAt = DateTimeOffset.UtcNow
                 };
-                // parse adjectives input and try to find it in the adjectives table and then link //
-                foreach(var itemId in request.Adjectives.TrimEnd(',').Split(","))
-                {
-                    int id = Int32.Parse(itemId);
-                    var adjective = await _context.Set<Adjective>().FirstOrDefaultAsync(x => x.Id == id);
-                    if (adjective != null)
+                if (request.Adjectives != null && request.Adjectives.Contains(',')) {
+                    foreach (var adjectiveId in request.Adjectives.TrimEnd(',').Split(","))
                     {
-                        entry.Adjectives.Add(adjective);
+                        Adjective? adjective = _context.Set<Adjective>().FirstOrDefault(x => x.Id == Int32.Parse(adjectiveId));
+                        if(adjective != null)
+                        {
+                            //entry.Adjectives.Add(adjective);
+                        } 
+                        else
+                        {
+                            continue;
+                        }
                     }
                 }
-                foreach(var itemId in request.RelatedTo.TrimEnd(',').Split(","))
-                {
-                    int id = Int32.Parse(itemId);
-                    var relatedTo = await _context.Set<Entry>().FirstOrDefaultAsync(x => x.Id == id);
-                    if (relatedTo != null)
+                if (request.RelatedTo != null && request.RelatedTo.Contains(',')) {
+                    foreach (var relatedEntryId in request.RelatedTo.TrimEnd(',').Split(","))
                     {
-                        entry.RelatedTo.Add(relatedTo);
+                        Entry? relatedEntry = _context.Set<Entry>().FirstOrDefault(x => x.Id == Int32.Parse(relatedEntryId));
+                        if(relatedEntry != null)
+                        {
+                            entry.RelatedEntries.Add(new EntryEntry()
+                            {
+                                EntryId = entry.Id,
+                                RelatedEntryId = relatedEntry.Id
+                            });
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
                 }
                 await _context.Set<Entry>().AddAsync(entry);

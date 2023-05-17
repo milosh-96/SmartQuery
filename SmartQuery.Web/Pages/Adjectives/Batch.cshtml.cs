@@ -21,10 +21,12 @@ namespace SmartQuery.Web.Pages.Adjectives
         {
         }
 
-        public async Task OnPostAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
             //return Command.GetType().Name;
-           // await _mediator.Send(new FixSlugsAllRequest());
+            await _mediator.Send(new RemoveWhiteSpacesFromAllRequest());
+            return RedirectToPage("/Adjectives/Batch");
+
         }
         public class RemoveWhiteSpacesFromAllRequest : IRequest<bool> { }
         public class RemoveWhiteSpacesFromAllHandler : IRequestHandler<RemoveWhiteSpacesFromAllRequest, bool>
@@ -39,7 +41,7 @@ namespace SmartQuery.Web.Pages.Adjectives
             public async Task<bool> Handle(RemoveWhiteSpacesFromAllRequest request, CancellationToken cancellationToken)
             {
                 await _context.Set<Adjective>()
-                    .ForEachAsync(x => x.Slug = x.Slug.Trim());
+                    .ForEachAsync(x => { x.Slug = x.Slug.Trim();x.Name = x.Name.Trim(); });
                 int result= await  _context.SaveChangesAsync();
                 if(result > 0) { return true; }
                 return false;

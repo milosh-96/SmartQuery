@@ -30,7 +30,7 @@ namespace SmartQuery.Web
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddFluentValidationClientsideAdapters();
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-            builder.Services.AddRazorPages();
+            builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
             var app = builder.Build();
 

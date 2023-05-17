@@ -4,7 +4,9 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">@Model.Data</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<div class="row">
+    <div class="col col-md-8 offset-md-2">
+        <h1 class="display-4">Welcome to SmartQuery</h1>
+        <partial name="./Shared/Partials/EntrySearchPartialVue" />
+    </div>
+    </div>

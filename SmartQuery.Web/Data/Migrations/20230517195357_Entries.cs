@@ -6,24 +6,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace SmartQuery.Web.Data.Migrations
 {
-    public partial class AddEntriesAndAdjectives : Migration
+    public partial class Entries : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Adjectives",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Slug = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Adjectives", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Entries",
                 columns: table => new
@@ -41,42 +27,41 @@ namespace SmartQuery.Web.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AdjectiveEntry",
+                name: "EntryEntry",
                 columns: table => new
                 {
-                    AdjectivesId = table.Column<int>(type: "integer", nullable: false),
-                    EntriesId = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EntryId = table.Column<int>(type: "integer", nullable: false),
+                    RelatedEntryId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AdjectiveEntry", x => new { x.AdjectivesId, x.EntriesId });
+                    table.PrimaryKey("PK_EntryEntry", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AdjectiveEntry_Adjectives_AdjectivesId",
-                        column: x => x.AdjectivesId,
-                        principalTable: "Adjectives",
+                        name: "FK_EntryEntry_Entries_EntryId",
+                        column: x => x.EntryId,
+                        principalTable: "Entries",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Cascade); 
                     table.ForeignKey(
-                        name: "FK_AdjectiveEntry_Entries_EntriesId",
-                        column: x => x.EntriesId,
+                        name: "FK_EntryEntry_Entries_RelatedEntryId",
+                        column: x => x.RelatedEntryId,
                         principalTable: "Entries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AdjectiveEntry_EntriesId",
-                table: "AdjectiveEntry",
-                column: "EntriesId");
+                name: "IX_EntryEntry_EntryId",
+                table: "EntryEntry",
+                column: "EntryId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AdjectiveEntry");
-
-            migrationBuilder.DropTable(
-                name: "Adjectives");
+                name: "EntryEntry");
 
             migrationBuilder.DropTable(
                 name: "Entries");

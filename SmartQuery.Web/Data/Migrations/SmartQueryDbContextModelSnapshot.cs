@@ -22,36 +22,6 @@ namespace SmartQuery.Web.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("AdjectiveEntry", b =>
-                {
-                    b.Property<int>("AdjectivesId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("EntriesId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("AdjectivesId", "EntriesId");
-
-                    b.HasIndex("EntriesId");
-
-                    b.ToTable("AdjectiveEntry");
-                });
-
-            modelBuilder.Entity("EntryEntry", b =>
-                {
-                    b.Property<int>("EntriesId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RelatedToId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("EntriesId", "RelatedToId");
-
-                    b.HasIndex("RelatedToId");
-
-                    b.ToTable("EntryEntry");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -159,27 +129,6 @@ namespace SmartQuery.Web.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SmartQuery.Web.Models.Adjective", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Adjectives");
-                });
-
             modelBuilder.Entity("SmartQuery.Web.Models.Entry", b =>
                 {
                     b.Property<int>("Id")
@@ -206,6 +155,27 @@ namespace SmartQuery.Web.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Entries");
+                });
+
+            modelBuilder.Entity("SmartQuery.Web.Models.EntryEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EntryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RelatedEntryId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntryId");
+
+                    b.ToTable("EntryEntry");
                 });
 
             modelBuilder.Entity("SmartQuery.Web.Models.WebRole", b =>
@@ -304,36 +274,6 @@ namespace SmartQuery.Web.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("AdjectiveEntry", b =>
-                {
-                    b.HasOne("SmartQuery.Web.Models.Adjective", null)
-                        .WithMany()
-                        .HasForeignKey("AdjectivesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SmartQuery.Web.Models.Entry", null)
-                        .WithMany()
-                        .HasForeignKey("EntriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EntryEntry", b =>
-                {
-                    b.HasOne("SmartQuery.Web.Models.Entry", null)
-                        .WithMany()
-                        .HasForeignKey("EntriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SmartQuery.Web.Models.Entry", null)
-                        .WithMany()
-                        .HasForeignKey("RelatedToId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("SmartQuery.Web.Models.WebRole", null)
@@ -383,6 +323,20 @@ namespace SmartQuery.Web.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartQuery.Web.Models.EntryEntry", b =>
+                {
+                    b.HasOne("SmartQuery.Web.Models.Entry", null)
+                        .WithMany("RelatedEntries")
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SmartQuery.Web.Models.Entry", b =>
+                {
+                    b.Navigation("RelatedEntries");
                 });
 #pragma warning restore 612, 618
         }

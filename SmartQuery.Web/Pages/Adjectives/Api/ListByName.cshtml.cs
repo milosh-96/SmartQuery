@@ -16,7 +16,7 @@ namespace SmartQuery.Web.Pages.Adjectives.Api
             _mediator = mediator;
         }
 
-        [FromQuery]
+        [BindProperty(SupportsGet =true)]
         public string? Query { get; set; }
         public async Task<IActionResult> OnGet()
         {
@@ -45,7 +45,7 @@ namespace SmartQuery.Web.Pages.Adjectives.Api
 
             public async Task<List<Adjective>> Handle(ListByNameQuery request, CancellationToken cancellationToken)
             {
-                return await _context.Set<Adjective>().Where(x=>x.Name.StartsWith(request.Name)).ToListAsync();
+                return await _context.Set<Adjective>().Where(x=>x.Name.ToLower().StartsWith(request.Name.ToLower())).ToListAsync();
             }
         }
     }

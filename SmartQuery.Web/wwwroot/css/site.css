@@ -16,3 +16,75 @@ html {
 body {
   margin-bottom: 60px;
 }
+.btn,.form-control {
+    border-radius:0;
+}
+
+
+.query-builder > ul {
+    height: 5vh;
+    border-radius:0;
+    animation: blink;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+
+}
+@media (min-width: 768px) {
+    .query-builder > ul {
+        height:unset;
+        animation:none;
+        margin:0;padding:0;
+    }
+    .query-builder {
+        animation: blink;
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+    }
+}
+
+    @keyframes blink {
+        0% {
+            background: rgba(255,255,0,0);
+        }
+
+        50% {
+            background: rgba(255,255,0,0.5);
+        }
+
+        99% {
+            background: rgba(255,255,0,0);
+        }
+    }
+
+
+    .w-20 {
+        width: 20% !important;
+    }
+    .w-60 {
+        width: 60% !important;
+    }
+
+    
+
+    @media (min-width: 768px) {
+        .md-w-20 {
+            width: 20% !important;
+        }
+        .md-w-25 {
+            width: 25% !important;
+        }
+        
+        .md-w-50 {
+            width: 50% !important;
+        }
+        .md-w-60 {
+            width: 60% !important;
+        }
+        .md-w-75 {
+            width: 75% !important;
+        }
+
+        .md-w-100 {
+            width: 100% !important;
+        }
+    }

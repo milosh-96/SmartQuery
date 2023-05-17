@@ -1,0 +1,27 @@
+﻿@page
+@using SmartQuery.Web.Models;
+@model SmartQuery.Web.Pages.Entries.SearchModel
+@{
+}
+
+<div class="row">
+    <div class="col">
+        <h2>Search Results</h2>
+        <p>Search Query for @Model.Query - @Model.Mode</p>
+        <hr />
+        <h2>Found: @Model.Results.Count</h2>
+        <ul class="list-group">
+            current search
+            @foreach (Entry item in Model.Results)
+            {
+                <li class="list-group-item">
+                    <div>
+                        <h3>
+                            @item.Name - related to @String.Join(',',item.RelatedEntries.Select(x=>x.RelatedEntryId))
+                        </h3>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
