@@ -71,18 +71,22 @@ namespace SmartQuery.Web.Pages.Entries
                     }
                 }
                 
+                //save the entry with adjectives
                 await _context.Set<Entry>().AddAsync(entry);
                 var result = await _context.SaveChangesAsync();
 
-
-                if (request.RelatedTo != null && request.RelatedTo.Contains(','))
+                if(result)
                 {
-                    foreach (var relatedEntryId in request.RelatedTo.TrimEnd(',').Split(","))
+
+                    // link entries //
+                    if (request.RelatedTo != null && request.RelatedTo.Contains(','))
                     {
-                        Entry? relatedEntry = _context.Set<Entry>().FirstOrDefault(x => x.Id == Int32.Parse(relatedEntryId));
-                        if (relatedEntry != null)
+                        foreach (var relatedEntryId in request.RelatedTo.TrimEnd(',').Split(","))
                         {
-                            _context.Set<EntryEntry>().AddRange(new List<EntryEntry>() {
+                            Entry? relatedEntry = _context.Set<Entry>().FirstOrDefault(x => x.Id == Int32.Parse(relatedEntryId));
+                            if (relatedEntry != null)
+                            {
+                                _context.Set<EntryEntry>().AddRange(new List<EntryEntry>() {
                                 new EntryEntry()
                             {
                                 EntryId = entry.Id,
@@ -94,15 +98,17 @@ namespace SmartQuery.Web.Pages.Entries
                             }
                             });
 
-                        result =    await _context.SaveChangesAsync();
-                        }
-                        else
-                        {
-                            continue;
+                                result = await _context.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                continue;
+                            }
                         }
                     }
                 }
 
+                // if everything went ok (all savechanges) the return will be true;
                 return result;
             }
         }
