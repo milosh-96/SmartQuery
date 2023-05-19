@@ -73,7 +73,9 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="/lib/typeahead.js/typeahead.bundle.js"></script>
+    <script src="/lib/vue/dist/vue.global.js"></script>
+@*    make a vue typeahead
+*@    <script src="/lib/typeahead.js/typeahead.bundle.js"></script>
     <script>
         var currentAdjectiveSelection = "";
         var adjectives = new Bloodhound({

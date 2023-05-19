@@ -75,7 +75,7 @@ namespace SmartQuery.Web.Pages.Entries
                 await _context.Set<Entry>().AddAsync(entry);
                 var result = await _context.SaveChangesAsync();
 
-                if(result)
+                if(result > 0)
                 {
 
                     // link entries //
