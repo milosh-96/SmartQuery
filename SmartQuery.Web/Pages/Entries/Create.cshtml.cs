@@ -35,7 +35,7 @@ namespace SmartQuery.Web.Pages.Entries
         public record Command : IRequest<int>
         {
             public string Name { get; init; }
-            public string Description { get; init; }
+            public string Description { get; init; } = "";
             public string Adjectives { get; init; }
             public string RelatedTo { get; init; }
         }
