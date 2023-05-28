@@ -58,7 +58,7 @@ namespace SmartQuery.Web.Pages.Entries
                 foreach (string item in request.Values)
                 {
                     var findEntry = _context.Set<Entry>().FirstOrDefault(x => x.Name.ToLower() == item.ToLower());
-                    if (findEntry == null) { continue; }
+                    if (findEntry == null) { return entries; }
                     int id = findEntry.Id;
                     searchItems.Add(id);
 
