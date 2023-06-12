@@ -11,14 +11,20 @@
 <h4>Course</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form method="post">
             <div class="form-group">
-                <label asp-for="@Model.Data.Name"></label>
-                <input class="form-control" asp-for="@Model.Data.Name" />
+                <strong>
+                    <label asp-for="@Model.Data.Name"></label>
+                </strong>
+                <input type="hidden" class="form-control" asp-for="@Model.Data.Name" />
+                <div id="entry-name-fill-in-app"></div>
+
             </div>
             <div class="form-group">
-                <label asp-for="@Model.Data.Description"></label>
+                <strong>
+                    <label asp-for="@Model.Data.Description"></label>
+                </strong>
                 <textarea 
                     class="form-control" asp-for="@Model.Data.Description">
                 </textarea>
@@ -26,26 +32,24 @@
             <div class="form-group">
                 <div class="row">
                     <div class="col">
-                        <label asp-for="@Model.Data.Adjectives"></label>
-                        <input type="hidden" autocomplete="off" asp-for="@Model.Data.Adjectives" />
+                        <strong>
+                            <label asp-for="@Model.Data.Adjectives">Select Adjectives that are associated</label>
+                        </strong>
+                        <input type="text" autocomplete="off" asp-for="@Model.Data.Adjectives" />
                         <div id="adjectives-autocomplete-app"></div>
                     </div>
-                    <div class="col">
-                        Selected: <ul class="list-group" id="selectedAdjectives"></ul>
-                    </div>
+                
                 </div>
 
             </div>
             <div class="form-group">
                 <div class="row">
                     <div class="col">
-                        <label asp-for="@Model.Data.RelatedTo"></label>
-                        <input type="hidden" autocomplete="off" asp-for="@Model.Data.RelatedTo" />
+                        <strong><label asp-for="@Model.Data.RelatedTo">Select Entries that are related to this item</label></strong>
+                        <input type="text" autocomplete="off" asp-for="@Model.Data.RelatedTo" />
                         <div id="entries-autocomplete-app"></div>
                     </div>
-                    <div class="col">
-                        Selected: <ul class="list-group" id="selectedEntries"></ul>
-                    </div>
+                  
                 </div>
             </div>
             <hr />
@@ -86,41 +90,55 @@
     }
 
     <partial name="../Shared/VueTemplates/AutocompletePartialVue" />
+    <partial name="../Shared/VueTemplates/AutoCompleteNewVue" />
+    <partial name="../Shared/VueTemplates/FillInVue" />
 
     <script type="module">
         import autoCompleteComponent from "/js/components/vue/autoCompleteComponent.js";
+        import autoCompleteNew from "/js/components/vue/autoCompleteNew.js";
+        import fillIn from "/js/components/vue/fillIn.js";
 
-        Vue.createApp(autoCompleteComponent,
+        Vue.createApp(fillIn,
             {
-            dataSourceUrl:"/Entries/Api/ListByName",
-            itemSelectedEventName:"EntrySelected",
+                syncEventName:"NameInputChanged",
+                dataSourceUrl: "/Entries/Api/ListByName",
+                inputLabel:"To prevent duplicate content, existing items will appear as you type.",
+            }
+        ).mount("#entry-name-fill-in-app");
+
+        // related to input //
+        Vue.createApp(autoCompleteNew,
+            {
+                syncEventName: "RelatedToItemsChanged",
+                dataSourceUrl: "/Entries/Api/ListByName",
             }
         ).mount("#entries-autocomplete-app");
-        
-        Vue.createApp(autoCompleteComponent,
+
+        Vue.createApp(autoCompleteNew,
             {
-            dataSourceUrl:"/Adjectives/Api/ListByName",
-            itemSelectedEventName:"AdjectiveSelected",
+                syncEventName: "AdjectiveItemsChanged",
+                dataSourceUrl: "/Adjectives/Api/ListByName",
             }
         ).mount("#adjectives-autocomplete-app");
 
     </script>
     <script>
-        var selectedEntries = [];
-        var selectedAdjectives = [];
-        document.addEventListener("EntrySelected",function(e) {
-            let item = JSON.parse(JSON.stringify(e.detail.item));
-            selectedEntries.push(item.id);// push new item to existing array
-            $("#Data_RelatedTo").val(selectedEntries.join(","));// join all items with commas
-            $("ul#selectedEntries").append('<li class="list-group-item">' + item.name + '</li>'); // add to display of current items
+        // sync inputs with vue form //
+        document.addEventListener("NameInputChanged",function(e) {
+            console.log(e.detail.input);
+            document.getElementById("Data_Name").value = e.detail.input; 
+        });
 
+        document.addEventListener("AdjectiveItemsChanged", function (e) {
+            console.log(e.detail.itemsIds);
+            document.getElementById("Data_Adjectives").value = e.detail.itemsIds;
+        }); 
+        
+        document.addEventListener("RelatedToItemsChanged", function (e) {
+            console.log(e.detail.itemsIds);
+            document.getElementById("Data_RelatedTo").value = e.detail.itemsIds;
         });
-        document.addEventListener("AdjectiveSelected",function(e) {
-            let item = JSON.parse(JSON.stringify(e.detail.item));
-            selectedAdjectives.push(item.id); // push new item to existing array
-            $("#Data_Adjectives").val(selectedAdjectives.join(",")); // join all items with commas
-            $("ul#selectedAdjectives").append('<li class="list-group-item">' + item.name + '</li>'); // add to display of current items
-        });
+       
     </script>
 <script src="/lib/typeahead.js/typeahead.bundle.js"></script>
    

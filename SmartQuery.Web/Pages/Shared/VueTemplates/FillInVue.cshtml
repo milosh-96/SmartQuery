@@ -1,0 +1,18 @@
+﻿<template id="fill-in-app">
+
+    <div class="form-group">
+        <label for="search-input">{{inputLabel}}</label>
+        <input id="search-input"  v-model="input" type="text" class="form-control">
+    </div>
+    <div id="search-wrapper" :class="[dropdownClass]">
+        <div class="dropdown-menu show" style="max-height:150px;overflow-y:scroll">
+            <div class="dropdown-item" v-bind:data-id="item.id" v-bind:data-name="item.name" @@click="this.itemSelected({id:item.id,name:item.name})" v-if="this.items.length > 0" v-for="item in this.items">
+                <span style="pointer-events:none" class="badge bg-secondary">
+                    {{item.name}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <hr>
+   
+</template>
