@@ -17,8 +17,7 @@
                 <strong>
                     <label asp-for="@Model.Data.Name"></label>
                 </strong>
-                <input type="hidden" class="form-control" asp-for="@Model.Data.Name" />
-                <div id="entry-name-fill-in-app"></div>
+                <input type="text" class="form-control" asp-for="@Model.Data.Name" />
 
             </div>
             <div class="form-group">
@@ -35,8 +34,11 @@
                         <strong>
                             <label asp-for="@Model.Data.Adjectives">Select Adjectives that are associated</label>
                         </strong>
-                        <input type="text" autocomplete="off" asp-for="@Model.Data.Adjectives" />
-                        <div id="adjectives-autocomplete-app"></div>
+                        <input type="hidden" autocomplete="off" asp-for="@Model.Data.Adjectives" />
+                        <auto-suggest selected-event-name="AdjectiveSelected" display-property="name" data-url="/Adjectives/Api/ListByName?Query="></auto-suggest>
+                        <div id="selected-adjectives">
+                            <ul class="list-group list-group-horizontal"></ul>
+                        </div>
                     </div>
                 
                 </div>
@@ -45,23 +47,20 @@
             <div class="form-group">
                 <div class="row">
                     <div class="col">
-                        <strong><label asp-for="@Model.Data.RelatedTo">Select Entries that are related to this item</label></strong>
-                        <input type="text" autocomplete="off" asp-for="@Model.Data.RelatedTo" />
-                        <div id="entries-autocomplete-app"></div>
+                        <strong>
+                            <label asp-for="@Model.Data.RelatedTo">Select Entries that are related to this item</label>
+                            </strong>
+                        <input type="text" hidden autocomplete="off" asp-for="@Model.Data.RelatedTo" />
+                        <auto-suggest selected-event-name="RelatedEntriesSelected" display-property="name" data-url="/Entries/Api/ListByName?Query="></auto-suggest>
+                        <div id="selected-related-entries">
+                            <ul class="list-group list-group-horizontal"></ul>
+                        </div>
                     </div>
                   
                 </div>
             </div>
             <hr />
-            <div class="form-group">
-                <div class="row">
-                    
-                  
-                    <hr />
-                    <div id="adjectives-autocomplete-app"></div>
-
-                </div>
-            </div>
+           
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -70,7 +69,6 @@
 </div>
 
 <div>
-    <div id="testing">aaa</div>
     <a asp-page="Index">Back to List</a>
 </div>
 
@@ -85,61 +83,38 @@
     </style>
 }
 @section Scripts {
+    <script src="/js/components/auto-suggest.js"></script>
+    <script>
+        let selectedAdjectives =[];
+        document.addEventListener("AdjectiveSelected", function (e) {
+            if(!selectedAdjectives.includes(e.detail.id)) {
+                selectedAdjectives.push(e.detail.id);
+                let liEl = document.createElement("li");
+                liEl.classList.add("list-group-item");
+                liEl.innerHTML = e.detail.name;
+                document.querySelector("#selected-adjectives ul").appendChild(liEl);
+            }
+           
+           document.getElementById("Data_Adjectives").setAttribute("value",selectedAdjectives.join(","));
+        });
+    </script>
+    <script>
+        let selectedRelatedEntries = [];
+        document.addEventListener("RelatedEntriesSelected", function (e) {
+            if (!selectedRelatedEntries.includes(e.detail.id)) {
+                selectedRelatedEntries.push(e.detail.id);
+                let liEl = document.createElement("li");
+                liEl.classList.add("list-group-item");
+                liEl.innerHTML = e.detail.name;
+                document.querySelector("#selected-related-entries ul").appendChild(liEl);
+            }
+
+            document.getElementById("Data_RelatedTo").setAttribute("value", selectedRelatedEntries.join(","));
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <partial name="../Shared/VueTemplates/AutocompletePartialVue" />
-    <partial name="../Shared/VueTemplates/AutoCompleteNewVue" />
-    <partial name="../Shared/VueTemplates/FillInVue" />
-
-    <script type="module">
-        import autoCompleteComponent from "/js/components/vue/autoCompleteComponent.js";
-        import autoCompleteNew from "/js/components/vue/autoCompleteNew.js";
-        import fillIn from "/js/components/vue/fillIn.js";
-
-        Vue.createApp(fillIn,
-            {
-                syncEventName:"NameInputChanged",
-                dataSourceUrl: "/Entries/Api/ListByName",
-                inputLabel:"To prevent duplicate content, existing items will appear as you type.",
-            }
-        ).mount("#entry-name-fill-in-app");
-
-        // related to input //
-        Vue.createApp(autoCompleteNew,
-            {
-                syncEventName: "RelatedToItemsChanged",
-                dataSourceUrl: "/Entries/Api/ListByName",
-            }
-        ).mount("#entries-autocomplete-app");
-
-        Vue.createApp(autoCompleteNew,
-            {
-                syncEventName: "AdjectiveItemsChanged",
-                dataSourceUrl: "/Adjectives/Api/ListByName",
-            }
-        ).mount("#adjectives-autocomplete-app");
-
-    </script>
-    <script>
-        // sync inputs with vue form //
-        document.addEventListener("NameInputChanged",function(e) {
-            console.log(e.detail.input);
-            document.getElementById("Data_Name").value = e.detail.input; 
-        });
-
-        document.addEventListener("AdjectiveItemsChanged", function (e) {
-            console.log(e.detail.itemsIds);
-            document.getElementById("Data_Adjectives").value = e.detail.itemsIds;
-        }); 
-        
-        document.addEventListener("RelatedToItemsChanged", function (e) {
-            console.log(e.detail.itemsIds);
-            document.getElementById("Data_RelatedTo").value = e.detail.itemsIds;
-        });
-       
-    </script>
-<script src="/lib/typeahead.js/typeahead.bundle.js"></script>
    
 }

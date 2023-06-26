@@ -1,12 +1,15 @@
 ﻿@page
 @model IndexModel
 @{
+    Layout = "_Layout-Home";
     ViewData["Title"] = "Home page";
 }
 
 <div class="row">
     <div class="col col-md-8 offset-md-2">
-        <h1 class="display-4">Welcome to SmartQuery</h1>
-        <partial name="./Shared/Partials/EntrySearchPartialVue" />
+        <div style="padding:1rem;text-align:center">
+            <h1>SmartQuery</h1>
+        </div>
+        <partial name="./Shared/Partials/EntrySearchPartial" />
     </div>
     </div>

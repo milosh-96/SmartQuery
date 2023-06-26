@@ -19,6 +19,8 @@ namespace SmartQuery.Web.Data
             builder.Entity<Entry>()
                 .HasMany(e => e.Adjectives).WithMany(e => e.Entries)
                 .UsingEntity<AdjectiveEntry>();
+
+        
             
 
             builder.Entity<AdjectiveEntry>().HasIndex(x => new { x.AdjectiveId, x.EntryId }).IsUnique();

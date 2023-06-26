@@ -7,5 +7,7 @@
         public int EntryId { get; set; }
         public int RelatedEntryId { get; set; }
 
+      
+
     }
 }

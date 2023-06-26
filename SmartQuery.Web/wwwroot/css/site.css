@@ -22,7 +22,7 @@ body {
 
 
 .query-builder > ul {
-    height: 5vh;
+    /*height: 5vh;*/
     border-radius:0;
     animation: blink;
     animation-duration: 2s;
