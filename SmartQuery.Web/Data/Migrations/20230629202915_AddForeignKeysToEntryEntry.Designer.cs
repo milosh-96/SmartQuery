@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartQuery.Web.Data;
@@ -11,9 +12,10 @@ using SmartQuery.Web.Data;
 namespace SmartQuery.Web.Data.Migrations
 {
     [DbContext(typeof(SmartQueryDbContext))]
-    partial class SmartQueryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230629202915_AddForeignKeysToEntryEntry")]
+    partial class AddForeignKeysToEntryEntry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

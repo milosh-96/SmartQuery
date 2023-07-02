@@ -1,5 +1,7 @@
 // this component requires lodash (tested on version 4.17.21) - make sure it's is available on all pages where this component appears //
-const template = document.createElement("template");
+
+(function(){
+let template = document.createElement("template");
 template.innerHTML = `
 <style>
     .hide {display:none;}
@@ -26,7 +28,7 @@ template.innerHTML = `
 
 <div style="display:flex">
     <div id="input-box">
-        <input type="text"  />
+        <input id="ac-input" type="text" placeholder="sss" />
 
     </div>
     <div class="dropdown hide">
@@ -42,6 +44,7 @@ template.innerHTML = `
 
 class AutoSuggest extends HTMLElement {
     data = [];
+    inputPlaceholder = "Search here...";
     selectedItemEventName = "AutoSuggestionItemSelected";
     constructor() {
         super();
@@ -53,8 +56,15 @@ class AutoSuggest extends HTMLElement {
         if (this.getAttribute("selected-event-name") != null) {
             this.selectedItemEventName = this.getAttribute("selected-event-name");
         }
-
+        if (this.getAttribute("input-placeholder") != null) {
+            this.inputPlaceholder = this.getAttribute("input-placeholder");
+        }
+        console.log(this.inputPlaceholder)
+        
         let input = this.shadowRoot.querySelector("#input-box").getElementsByTagName("input")[0];
+        //set placeholder //
+        input.placeholder = this.inputPlaceholder;
+
         let closeButton = this.shadowRoot.querySelector("#close-dropdown");
         let dropdownContainer = this.shadowRoot.querySelector(".dropdown");
 
@@ -145,3 +155,5 @@ class AutoSuggest extends HTMLElement {
 }
 
 window.customElements.define('auto-suggest', AutoSuggest);
+delete window.template;
+})();

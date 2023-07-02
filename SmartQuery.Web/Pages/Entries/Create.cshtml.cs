@@ -23,23 +23,23 @@ namespace SmartQuery.Web.Pages.Entries
         }
         public async Task<IActionResult> OnPostAsync()
         {
-             var result = await _mediator.Send(Data);
-            if(result == 1)
+            var result = await _mediator.Send(Data);
+            if (result != null)
             {
                 Data = new Command();
                 ModelState.Clear();
             }
-            return RedirectToPage("/Entries/Create");
+            return RedirectToPage("/Entries/Linker",new { TargetId=result.Id});
 
         }
-        public record Command : IRequest<int>
+        public record Command : IRequest<Entry>
         {
             public string Name { get; init; }
             public string Description { get; init; } = "";
             public string Adjectives { get; init; }
             public string RelatedTo { get; init; }
         }
-        public class CommandHandler : IRequestHandler<Command, int>
+        public class CommandHandler : IRequestHandler<Command, Entry>
         {
             private readonly SmartQueryDbContext _context;
 
@@ -48,57 +48,26 @@ namespace SmartQuery.Web.Pages.Entries
                 _context = context;
             }
 
-            public async Task<int> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Entry> Handle(Command request, CancellationToken cancellationToken)
             {
-                Entry entry = new Entry() {
+                Entry entry = new Entry()
+                {
                     Name = request.Name,
                     Description = request.Description,
                     Slug = new Slugify.SlugHelper().GenerateSlug(request.Name),
                     CreatedAt = DateTimeOffset.UtcNow
                 };
-                if (request.Adjectives != null && request.Adjectives.Contains(',')) {
-                    foreach (var adjectiveId in request.Adjectives.TrimEnd(',').Split(","))
-                    {
-                        Adjective? adjective = _context.Set<Adjective>().FirstOrDefault(x => x.Id == Int32.Parse(adjectiveId));
-                        if(adjective != null)
-                        {
-                            entry.Adjectives.Add(adjective);
-                        } 
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                }
-                
-                //save the entry with adjectives
-                await _context.Set<Entry>().AddAsync(entry);
-                var result = await _context.SaveChangesAsync();
-
-                if(result > 0)
+                if (request.Adjectives != null)
                 {
 
-                    // link entries //
-                    if (request.RelatedTo != null && request.RelatedTo.Contains(','))
+                    if (request.Adjectives.Contains(','))
                     {
-                        foreach (var relatedEntryId in request.RelatedTo.TrimEnd(',').Split(","))
+                        foreach (var adjectiveId in request.Adjectives.TrimEnd(',').Split(","))
                         {
-                            Entry? relatedEntry = _context.Set<Entry>().FirstOrDefault(x => x.Id == Int32.Parse(relatedEntryId));
-                            if (relatedEntry != null)
+                            Adjective? adjective = _context.Set<Adjective>().FirstOrDefault(x => x.Id == Int32.Parse(adjectiveId));
+                            if (adjective != null)
                             {
-                                _context.Set<EntryEntry>().AddRange(new List<EntryEntry>() {
-                                new EntryEntry()
-                            {
-                                EntryId = entry.Id,
-                                RelatedEntryId = relatedEntry.Id
-                            },  new EntryEntry()
-                            {
-                                RelatedEntryId = entry.Id,
-                                EntryId = relatedEntry.Id
-                            }
-                            });
-
-                                result = await _context.SaveChangesAsync();
+                                entry.Adjectives.Add(adjective);
                             }
                             else
                             {
@@ -106,10 +75,21 @@ namespace SmartQuery.Web.Pages.Entries
                             }
                         }
                     }
+                    else if (!String.IsNullOrEmpty(request.Adjectives))
+                    {
+                        Adjective? adjective = _context.Set<Adjective>().FirstOrDefault(x => x.Id == Int32.Parse(request.Adjectives));
+                        if (adjective != null)
+                        {
+                            entry.Adjectives.Add(adjective);
+                        }
+
+                    }
                 }
 
-                // if everything went ok (all savechanges) the return will be true;
-                return result;
+                await _context.Set<Entry>().AddAsync(entry);
+                var result = await _context.SaveChangesAsync();
+
+                return entry;
             }
         }
     }

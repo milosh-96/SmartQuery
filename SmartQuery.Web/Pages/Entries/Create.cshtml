@@ -17,8 +17,12 @@
                 <strong>
                     <label asp-for="@Model.Data.Name"></label>
                 </strong>
-                <input type="text" class="form-control" asp-for="@Model.Data.Name" />
-
+                <div class="d-flex">
+                    <input type="text" autocomplete="off" class="form-control" asp-for="@Model.Data.Name" />
+                <fill-in id="name-check">
+                    <slot name="test">aaaaaaaaaaaa</slot>
+                </fill-in>
+                </div>
             </div>
             <div class="form-group">
                 <strong>
@@ -28,41 +32,9 @@
                     class="form-control" asp-for="@Model.Data.Description">
                 </textarea>
             </div>
+       
             <div class="form-group">
-                <div class="row">
-                    <div class="col">
-                        <strong>
-                            <label asp-for="@Model.Data.Adjectives">Select Adjectives that are associated</label>
-                        </strong>
-                        <input type="hidden" autocomplete="off" asp-for="@Model.Data.Adjectives" />
-                        <auto-suggest selected-event-name="AdjectiveSelected" display-property="name" data-url="/Adjectives/Api/ListByName?Query="></auto-suggest>
-                        <div id="selected-adjectives">
-                            <ul class="list-group list-group-horizontal"></ul>
-                        </div>
-                    </div>
-                
-                </div>
-
-            </div>
-            <div class="form-group">
-                <div class="row">
-                    <div class="col">
-                        <strong>
-                            <label asp-for="@Model.Data.RelatedTo">Select Entries that are related to this item</label>
-                            </strong>
-                        <input type="text" hidden autocomplete="off" asp-for="@Model.Data.RelatedTo" />
-                        <auto-suggest selected-event-name="RelatedEntriesSelected" display-property="name" data-url="/Entries/Api/ListByName?Query="></auto-suggest>
-                        <div id="selected-related-entries">
-                            <ul class="list-group list-group-horizontal"></ul>
-                        </div>
-                    </div>
-                  
-                </div>
-            </div>
-            <hr />
-           
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input id="submit-button" disabled="disabled" type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -83,35 +55,26 @@
     </style>
 }
 @section Scripts {
-    <script src="/js/components/auto-suggest.js"></script>
+    <script src="/js/components/fill-in.js"></script>
     <script>
-        let selectedAdjectives =[];
-        document.addEventListener("AdjectiveSelected", function (e) {
-            if(!selectedAdjectives.includes(e.detail.id)) {
-                selectedAdjectives.push(e.detail.id);
-                let liEl = document.createElement("li");
-                liEl.classList.add("list-group-item");
-                liEl.innerHTML = e.detail.name;
-                document.querySelector("#selected-adjectives ul").appendChild(liEl);
-            }
-           
-           document.getElementById("Data_Adjectives").setAttribute("value",selectedAdjectives.join(","));
-        });
-    </script>
-    <script>
-        let selectedRelatedEntries = [];
-        document.addEventListener("RelatedEntriesSelected", function (e) {
-            if (!selectedRelatedEntries.includes(e.detail.id)) {
-                selectedRelatedEntries.push(e.detail.id);
-                let liEl = document.createElement("li");
-                liEl.classList.add("list-group-item");
-                liEl.innerHTML = e.detail.name;
-                document.querySelector("#selected-related-entries ul").appendChild(liEl);
-            }
+        
+        let el = document.getElementById("name-check");
 
-            document.getElementById("Data_RelatedTo").setAttribute("value", selectedRelatedEntries.join(","));
+        document.getElementById("Data_Name").addEventListener("blur",function(e) {
+            let attribute = el.getAttribute("query") ?? "";
+            document.getElementById("name-check").setAttribute("query",this.value);
         });
+        document.addEventListener("FillInChecked",(e)=>{
+            //console.log(e.detail);
+            if(e.detail) {
+                document.getElementById("submit-button").setAttribute("disabled","disabled");
+            }
+            else {
+                document.getElementById("submit-button").removeAttribute("disabled");
+            }
+        })
     </script>
+    
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

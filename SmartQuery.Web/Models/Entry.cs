@@ -2,7 +2,7 @@
 
 namespace SmartQuery.Web.Models
 {
-    public class Entry : INamedEntity,IEntity,ITimestampedEntity
+    public class Entry : INamedEntity, IEntity, ITimestampedEntity
     {
         public int Id { get; set; }
 
@@ -16,7 +16,6 @@ namespace SmartQuery.Web.Models
 
         public List<Adjective> Adjectives { get; set; } = new List<Adjective>();
 
-
-        public List<EntryEntry> RelatedEntries { get; set; } = new List<EntryEntry>();
+        public List<EntryEntry> RelatedEntries { get; set; }
     }
 }

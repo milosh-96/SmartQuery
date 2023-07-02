@@ -20,8 +20,12 @@ namespace SmartQuery.Web.Data
                 .HasMany(e => e.Adjectives).WithMany(e => e.Entries)
                 .UsingEntity<AdjectiveEntry>();
 
-        
-            
+            builder.Entity<EntryEntry>()
+                    .HasOne(e => e.Entry)
+                    .WithMany(e => e.RelatedEntries)
+                    .HasForeignKey(e => e.EntryId);
+
+
 
             builder.Entity<AdjectiveEntry>().HasIndex(x => new { x.AdjectiveId, x.EntryId }).IsUnique();
             

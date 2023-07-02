@@ -1,0 +1,108 @@
+﻿@page
+@model SmartQuery.Web.Pages.Entries.LinkerModel
+@{
+}
+<div>
+   <form>
+      <div class="d-flex">
+            <div>
+       @if(Model.TargetEntryId < 1) {
+            <auto-suggest selected-event-name="TargetEntrySelected" display-property="name" data-url="/Entries/Api/ListByName?Query="></auto-suggest>
+       }
+        <input type="hidden" asp-for="Data.TargetEntryId" />
+        <div id="selected-target-entry">
+            <ul class="list-group list-group-horizontal"></ul>
+        </div>
+    </div>
+    <div>
+        <auto-suggest selected-event-name="LinkingEntrySelected" display-property="name" data-url="/Entries/Api/ListByName?Query="></auto-suggest>
+        <input type="hidden" asp-for="Data.LinkingEntries" />
+
+        <div id="selected-entries">
+            <ul class="list-group"></ul>
+        </div>
+    </div>
+      </div>
+   </form>
+</div>
+@section Scripts{
+    <script src="/js/components/auto-suggest.js"></script>
+    <script src="/js/components/linker/linking-item.js"></script>
+    <script>
+       var linker =  {
+        selectedTarget: [],
+        selectedLinkingEntries: [],
+        loadTarget: async function(id,name = "undefined") {
+             // handle newly selected target element
+                this.selectedTarget.push(id);
+                let liEl = document.createElement("li");
+                liEl.classList.add("list-group-item");
+                    liEl.innerHTML = name;
+                document.querySelector("#selected-target-entry ul").appendChild(liEl);
+
+                //load already linked items //
+                await fetch('/Entries/Api/GetRelatedEntries?EntryId='+id).then((response)=>{return response.json()})
+                .then((data)=>{
+                        document.getElementById("Data_LinkingEntries").setAttribute("value", this.selectedLinkingEntries.join(","));
+                        data.map(item=>{
+                            // push id to the array that will be binded to form via a hidden input field
+                            this.selectedLinkingEntries.push(item.id);
+                            // display element in the list
+                            let liEl = document.createElement("li");
+                            liEl.classList.add("list-group-item");
+                            let linkingItem = document.createElement("linker-linking-item");
+                            linkingItem.setAttribute("item",JSON.stringify(item));
+                            liEl.appendChild(linkingItem);
+                            document.querySelector("#selected-entries ul").appendChild(liEl);
+                        });
+                });
+               
+        }
+       }
+    </script>
+    <script>
+        
+
+        document.addEventListener("DOMContentLoaded",async function(event){
+           const url = new URL(window.location.href);
+           const params = url.searchParams;
+            // get target key/value from URLSearchParams object
+           const targetId = params.get('TargetEntryId'); 
+           await fetch('/Entries/Api/Single?Id='+targetId).then((response)=>{
+               return response.json();
+           }).then((data)=>{
+               linker.loadTarget(data.id,data.name);
+           }).catch(error=>{console.log(error)});
+        });
+
+        document.addEventListener("TargetEntrySelected", async (e) => {
+            if (!linker.selectedTarget.includes(e.detail.id) && linker.selectedTarget.length < 1) {
+                linker.loadTarget(e.detail.id,e.detail.name);
+            }
+            document.getElementById("Data_TargetEntryId").setAttribute("value", linker.selectedTarget.join(","));
+        }); 
+        document.addEventListener("LinkingEntrySelected", async function (e) {
+            if (!linker.selectedLinkingEntries.includes(e.detail.id)) {
+                linker.selectedLinkingEntries.push(e.detail.id);
+                let formData = new FormData();
+                formData.append("targetId",linker.selectedTarget[0]);
+                formData.append("linkingEntryId",e.detail.id);
+                await fetch('/Entries/Api/Linker/Add',{
+                    method:'post',
+                    body:formData
+                }).then((response)=>{return response.json()})
+                .then((data)=>{
+                    let liEl = document.createElement("li");
+                liEl.classList.add("list-group-item");
+                let linkingItem = document.createElement("linker-linking-item");
+                linkingItem.setAttribute("item",JSON.stringify(e.detail));
+                liEl.appendChild(linkingItem);
+                document.querySelector("#selected-entries ul").appendChild(liEl);
+                }).catch((error)=>{alert("error!");});
+                
+            }
+
+            document.getElementById("Data_LinkingEntries").setAttribute("value", linker.selectedLinkingEntries.join(","));
+        });
+    </script>
+}
