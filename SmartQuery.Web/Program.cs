@@ -54,7 +54,11 @@ namespace SmartQuery.Web
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapRazorPages();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+                endpoints.MapControllers();
+            });
 
             app.Run();
         }

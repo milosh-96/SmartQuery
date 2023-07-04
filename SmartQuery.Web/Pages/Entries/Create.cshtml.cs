@@ -18,6 +18,9 @@ namespace SmartQuery.Web.Pages.Entries
 
         [BindProperty]
         public Command Data { get; set; } = new Command();
+
+        [BindProperty]
+        public bool RedirectToLinker { get; set; } = false;
         public void OnGet()
         {
         }
@@ -29,7 +32,11 @@ namespace SmartQuery.Web.Pages.Entries
                 Data = new Command();
                 ModelState.Clear();
             }
-            return RedirectToPage("/Entries/Linker",new { TargetId=result.Id});
+            if (RedirectToLinker)
+            {
+                return RedirectToPage("/Entries/Linker", new { TargetId = result.Id });
+            }
+            return RedirectToPage("/Entries/Create");
 
         }
         public record Command : IRequest<Entry>

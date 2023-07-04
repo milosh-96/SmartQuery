@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace SmartQuery.Web.Models
 {
@@ -16,6 +17,7 @@ namespace SmartQuery.Web.Models
 
         public List<Adjective> Adjectives { get; set; } = new List<Adjective>();
 
+        [JsonIgnore]
         public List<EntryEntry> RelatedEntries { get; set; }
     }
 }

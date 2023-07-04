@@ -20,16 +20,16 @@
                 this.item = JSON.parse(this.getAttribute("item"));
                 this.shadowRoot.getElementById("name").innerHTML = this.item.name;
             }
+            this.shadowRoot.getElementById("remove").addEventListener("click", () => {
+                this.removeItem();
+                this.shadowRoot.getElementById("name").innerHTML = "removed";
+            });
         }
         async removeItem() {
-            let result = false;
-          
-            return result;
+            let customEvent = new CustomEvent("LinkerRemoveItemSelected", { detail: this.item, composed: true });
+            document.dispatchEvent(customEvent);
         }
-        async delete(){
-           
-           
-        }
+       
     }
     window.customElements.define("linker-linking-item",LinkingItem);
 })();

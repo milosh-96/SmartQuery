@@ -7,7 +7,10 @@
       <div class="d-flex">
             <div>
        @if(Model.TargetEntryId < 1) {
-            <auto-suggest selected-event-name="TargetEntrySelected" display-property="name" data-url="/Entries/Api/ListByName?Query="></auto-suggest>
+            <auto-suggest
+                selected-event-name="TargetEntrySelected"
+                display-property="name"
+                data-url="/api/Entries/List?Name="></auto-suggest>
        }
         <input type="hidden" asp-for="Data.TargetEntryId" />
         <div id="selected-target-entry">
@@ -15,7 +18,10 @@
         </div>
     </div>
     <div>
-        <auto-suggest selected-event-name="LinkingEntrySelected" display-property="name" data-url="/Entries/Api/ListByName?Query="></auto-suggest>
+        <auto-suggest
+            selected-event-name="LinkingEntrySelected"
+            display-property="name"
+            data-url="/api/Entries/List?Name="></auto-suggest>
         <input type="hidden" asp-for="Data.LinkingEntries" />
 
         <div id="selected-entries">
@@ -41,7 +47,7 @@
                 document.querySelector("#selected-target-entry ul").appendChild(liEl);
 
                 //load already linked items //
-                await fetch('/Entries/Api/GetRelatedEntries?EntryId='+id).then((response)=>{return response.json()})
+                await fetch('/api/Entries/'+id+'/GetRelatedEntries').then((response)=>{return response.json()})
                 .then((data)=>{
                         document.getElementById("Data_LinkingEntries").setAttribute("value", this.selectedLinkingEntries.join(","));
                         data.map(item=>{
@@ -67,12 +73,28 @@
            const url = new URL(window.location.href);
            const params = url.searchParams;
             // get target key/value from URLSearchParams object
-           const targetId = params.get('TargetEntryId'); 
-           await fetch('/Entries/Api/Single?Id='+targetId).then((response)=>{
+           const targetId = params.get('TargetId'); 
+           await fetch('/api/Entries/'+targetId).then((response)=>{
                return response.json();
            }).then((data)=>{
                linker.loadTarget(data.id,data.name);
            }).catch(error=>{console.log(error)});
+        });
+
+        document.addEventListener("LinkerRemoveItemSelected", async function (e) {
+            let jsonData = { "itemAId": linker.selectedTarget[0], "itemBId": e.detail.id };
+
+            await fetch('/api/Entries/Linker/Remove', {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            }).then((response) => { return response.json() })
+                .then((data) => {
+                    alert("removed");
+                }).catch((error) => { alert("error!"); });
         });
 
         document.addEventListener("TargetEntrySelected", async (e) => {
@@ -84,12 +106,15 @@
         document.addEventListener("LinkingEntrySelected", async function (e) {
             if (!linker.selectedLinkingEntries.includes(e.detail.id)) {
                 linker.selectedLinkingEntries.push(e.detail.id);
-                let formData = new FormData();
-                formData.append("targetId",linker.selectedTarget[0]);
-                formData.append("linkingEntryId",e.detail.id);
-                await fetch('/Entries/Api/Linker/Add',{
+                let jsonData = { "targetId": linker.selectedTarget[0],"linkingEntryId" :e.detail.id};
+              
+                await fetch('/api/Entries/Linker/Add',{
                     method:'post',
-                    body:formData
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body:JSON.stringify(jsonData)
                 }).then((response)=>{return response.json()})
                 .then((data)=>{
                     let liEl = document.createElement("li");

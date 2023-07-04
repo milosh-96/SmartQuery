@@ -35,6 +35,10 @@
        
             <div class="form-group">
                 <input id="submit-button" disabled="disabled" type="submit" value="Create" class="btn btn-primary" />
+                <label>Redirect to Linker
+                    <input type="checkbox" asp-for="RedirectToLinker" />
+
+                </label>
             </div>
         </form>
     </div>
@@ -68,9 +72,11 @@
             //console.log(e.detail);
             if(e.detail) {
                 document.getElementById("submit-button").setAttribute("disabled","disabled");
+                document.getElementById("submit-button-linker").setAttribute("disabled","disabled");
             }
             else {
                 document.getElementById("submit-button").removeAttribute("disabled");
+                document.getElementById("submit-button-linker").removeAttribute("disabled");
             }
         })
     </script>
